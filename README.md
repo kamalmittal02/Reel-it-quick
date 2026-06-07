@@ -54,12 +54,53 @@ Use **Load all reels** to re-run or **Stop loading** to halt early.
 
 | File | World | Role |
 |------|-------|------|
-| `manifest.json` | — | MV3 config; registers the background worker + content scripts |
-| `src/background.js` | service worker | Toggles the panel from the toolbar icon |
+| `manifest.json` | — | MV3 config for **Chrome/Edge** (background service worker) |
+| `manifest.firefox.json` | — | MV3 config for **Firefox** (event-page background + `gecko` id) |
+| `src/background.js` | service worker / event page | Toggles the panel from the toolbar icon |
 | `src/interceptor.js` | MAIN | Wraps `fetch`/`XHR`, forwards Instagram JSON, drives `clips/user` pagination |
 | `src/extractor.js` | ISOLATED | Parses reels, extracts hashtags/keywords, cleans noise |
 | `src/content.js` | ISOLATED | In-memory store (30-min TTL, profile-scoped) + the overlay panel UI |
 | `src/panel.css` | — | Panel styles (namespaced with `.igrf-`) |
+
+## Cross-browser support
+
+- **Chrome / Edge** — use `manifest.json` as-is (Edge is Chromium, no changes).
+- **Firefox** — uses `manifest.firefox.json` (requires **Firefox 128+** for
+  `world: "MAIN"` content scripts). The background uses `chrome`/`browser` via a
+  `globalThis.browser || globalThis.chrome` shim so promises work on both.
+
+### Building store packages
+
+Run the build script (Windows PowerShell) from the project root:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File build.ps1
+```
+
+This produces ZIP-spec-compliant packages in `dist/`:
+
+- `dist/reel-it-quick-chrome.zip` → Chrome Web Store **and** Edge Add-ons
+- `dist/reel-it-quick-firefox.zip` → Firefox Add-ons (AMO)
+
+Each zip has `manifest.json` + `src/` at its root.
+
+### Loading unpacked for development
+
+- **Chrome/Edge**: `chrome://extensions` → Developer mode → **Load unpacked** →
+  select the project folder.
+- **Firefox**: rename `manifest.firefox.json` to `manifest.json` (or use the
+  built zip), then `about:debugging` → **This Firefox** → **Load Temporary
+  Add-on** → pick the `manifest.json`.
+
+## Publishing
+
+| Store | Cost | Notes |
+|-------|------|-------|
+| **Chrome Web Store** | one-time $5 | Upload `…-chrome.zip`; needs icons + privacy policy |
+| **Edge Add-ons** | free | Same zip as Chrome; usually faster review |
+| **Firefox AMO** | free | Upload `…-firefox.zip` |
+
+The icon set (16/48/128 px) lives in `icons/` and is wired into both manifests.
 
 Pagination resolves the profile's user id (from captured payloads or a
 `web_profile_info` lookup) and calls Instagram's `clips/user` endpoint directly,

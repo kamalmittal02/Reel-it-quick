@@ -8,13 +8,19 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "reel-it-quick@kamalmittal02.github.io",
+      "strict_min_version": "128.0"
+    }
+  },
   "permissions": ["scripting"],
   "host_permissions": [
     "https://www.instagram.com/*",
     "https://instagram.com/*"
   ],
   "background": {
-    "service_worker": "src/background.js"
+    "scripts": ["src/background.js"]
   },
   "action": {
     "default_title": "Reel It Quick — open on instagram.com",

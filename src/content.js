@@ -310,7 +310,8 @@
     onLoadClick();
   }
 
-  chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+  const api = globalThis.browser || globalThis.chrome;
+  api.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     if (msg && msg.type === "IGRF_TOGGLE") {
       togglePanel();
       sendResponse({ ok: true, open: state.open });
