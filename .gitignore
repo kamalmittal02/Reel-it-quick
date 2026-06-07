@@ -1,0 +1,18 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Node (if tooling is added later)
+node_modules/
+npm-debug.log*
+
+# Build artifacts
+*.zip
+dist/
+
+# Agent / IDE scratch folders
+/agent-tools/
+/terminals/
